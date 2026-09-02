@@ -3,12 +3,16 @@
 import heapq
 import logging
 from collections import Counter, defaultdict
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Sequence
 from itertools import chain, pairwise
 from os import PathLike
 
 from .file.load import load_text
-from .pre_tokenize import pre_tokenize_lines
+from .pre_tokenize import (
+    compile_special_pattern,
+    pre_tokenize_lines,
+    split_special_tokens,
+)
 from .types import *
 from .vocabulary import Vocabulary
 
@@ -28,8 +32,12 @@ class Corpus:
         return self.text
 
 
-def pre_tokenize(text: Corpus) -> Iterator[bytes]:
-    return pre_tokenize_lines(iter(text))
+def pre_tokenize(text: Corpus, special_tokens: Sequence[str] = ()) -> Iterator[bytes]:
+    special_pattern = compile_special_pattern(special_tokens)
+    for line in text:
+        for segment, is_special in split_special_tokens(line, special_pattern):
+            if not is_special:
+                yield from pre_tokenize_lines((segment,))
 
 
 def aggregate_tokens(
@@ -84,13 +92,18 @@ def update_aggregated_tokens(
 def training_loop_baseline(
     corpora: list[Corpus],
     stop_when: Callable[[int, int], bool] = lambda count, term: term >= 100,
+    special_tokens: Sequence[str] = (),
 ) -> Vocabulary:
     logger = logging.getLogger("BASELINE")
     logger.setLevel(logging.DEBUG)
 
-    pre_tokens = chain.from_iterable([pre_tokenize(corpus) for corpus in corpora])
+    pre_tokens = chain.from_iterable(
+        pre_tokenize(corpus, special_tokens) for corpus in corpora
+    )
 
     vocabulary = Vocabulary()
+    for special_token in special_tokens:
+        vocabulary.add_token(special_token.encode("utf-8"))
 
     aggregated_tokens = aggregate_tokens(map(tuple, pre_tokens))
     term = 0
@@ -133,13 +146,18 @@ def heap_update(
 def training_loop_optimized(
     corpora: list[Corpus],
     stop_when: Callable[[int, int], bool] = lambda count, term: term >= 100,
+    special_tokens: Sequence[str] = (),
 ) -> Vocabulary:
     logger = logging.getLogger("OPTIMIZED(1)")
     logger.setLevel(logging.DEBUG)
 
-    pre_tokens = chain.from_iterable([pre_tokenize(corpus) for corpus in corpora])
+    pre_tokens = chain.from_iterable(
+        pre_tokenize(corpus, special_tokens) for corpus in corpora
+    )
 
     vocabulary = Vocabulary()
+    for special_token in special_tokens:
+        vocabulary.add_token(special_token.encode("utf-8"))
     pair_counts: Counter[Pair] = Counter()
     pair_to_tokens: dict[Pair, set[Tokens]] = defaultdict(set)
 

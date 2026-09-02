@@ -5,18 +5,29 @@ description = "CS336 assignment 1: Basics"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
-    "ipykernel>=7.3.0",
+    "einops>=0.8.0",
+    "numpy>=2.0",
     "regex>=2026.7.19",
+    "torch>=2.13.0",
 ]
 
 [project.scripts]
 main = "basics:main"
 
 [build-system]
-requires = ["uv_build>=0.12.5,<0.13.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+py-modules = ["generation", "optimization", "training"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["basics*", "model*", "tokenizer*"]
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.3.0",
     "pytest>=9.1.1",
 ]

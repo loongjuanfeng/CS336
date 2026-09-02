@@ -121,3 +121,40 @@ def test_trained_vocabulary_roundtrip(tmp_path: Path):
 
     assert decode(vocabulary, encode(vocabulary, sample)) == sample
     assert len(encode(vocabulary, sample)) < len(sample.encode("utf-8"))
+
+def test_training_excludes_special_tokens_from_bpe_merges(tmp_path: Path):
+    special_token = "<|endoftext|>"
+    corpus = _write_corpus(
+        tmp_path / "corpus.txt",
+        f"ab{special_token}ab\n",
+    )
+
+    vocabulary = training_loop_baseline(
+        [corpus],
+        lambda _count, term: term >= 1,
+        [special_token],
+    )
+
+    special_id = vocabulary.get_token(special_token.encode("utf-8"))
+    ab_id = vocabulary.get_token(b"ab")
+    assert special_id >= 256
+    assert ab_id >= 256
+    assert encode(vocabulary, f"ab{special_token}ab", [special_token]) == [
+        ab_id,
+        special_id,
+        ab_id,
+    ]
+def test_optimized_training_preserves_special_tokens(tmp_path: Path):
+    special_token = "<|endoftext|>"
+    corpus = _write_corpus(
+        tmp_path / "corpus.txt",
+        f"hello{special_token}world\n",
+    )
+
+    vocabulary = training_loop_optimized([corpus], special_tokens=[special_token])
+
+    assert vocabulary.get_token(special_token.encode("utf-8")) >= 256
+    assert decode(
+        vocabulary,
+        encode(vocabulary, f"hello{special_token}world", [special_token]),
+    ) == f"hello{special_token}world"
