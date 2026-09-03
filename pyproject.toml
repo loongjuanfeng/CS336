@@ -29,5 +29,6 @@ include = ["basics*", "model*", "tokenizer*"]
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
+    "modal>=1.5.5",
     "pytest>=9.1.1",
 ]
