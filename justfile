@@ -1,5 +1,5 @@
 check:
-    ruff check src
+    ruff check src examples
     ty check
 
 format:
