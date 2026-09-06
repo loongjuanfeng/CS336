@@ -81,7 +81,7 @@ def triton_add(
 
     output = torch.empty_like(x)
     n_elements = x.numel()
-    grid = (triton.cdiv(n_elements, block_size),)
+    grid = ((n_elements + block_size - 1) // block_size,)
     # Triton's launcher accepts an int for a constexpr meta-parameter, but its
     # current type information requires an instance of tl.constexpr here.
     # ty: ignore[invalid-argument-type]
