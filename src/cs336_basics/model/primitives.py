@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 
 import torch
-from einops import einsum
 from torch import Tensor, nn
 
 
@@ -41,11 +40,7 @@ class Linear(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         """Apply the transformation to the final dimension of ``x``."""
-        return einsum(
-            x,
-            self.weight,
-            "... input_dim, output_dim input_dim -> ... output_dim",
-        )
+        return x @ self.weight.T
 
 
 class Embedding(nn.Module):
@@ -64,9 +59,9 @@ class Embedding(nn.Module):
         )
         nn.init.trunc_normal_(self.weight, mean=0.0, std=1.0, a=-3.0, b=3.0)
 
-    def forward(self, token_ids: Tensor) -> Tensor:
+    def forward(self, input_ids: Tensor) -> Tensor:
         """Return the embedding vector for every token id."""
-        return self.weight[token_ids]
+        return self.weight[input_ids]
 
 
 class RMSNorm(nn.Module):
@@ -130,23 +125,13 @@ def softmax(x: Tensor, dim: int) -> Tensor:
 
 
 def scaled_dot_product_attention(
-    Q: Tensor,
-    K: Tensor,
-    V: Tensor,
+    q: Tensor,
+    k: Tensor,
+    v: Tensor,
     mask: Tensor | None = None,
 ) -> Tensor:
     """Compute masked scaled dot-product attention for arbitrary batch axes."""
-    scores = einsum(
-        Q,
-        K,
-        "... query_position head_dim, ... key_position head_dim -> ... query_position key_position",
-    )
-    scores = scores / math.sqrt(Q.shape[-1])
+    scores = q @ k.transpose(-2, -1) / math.sqrt(q.shape[-1])
     if mask is not None:
         scores = scores.masked_fill(~mask, -torch.inf)
-    probabilities = softmax(scores, dim=-1)
-    return einsum(
-        probabilities,
-        V,
-        "... query_position key_position, ... key_position value_dim -> ... query_position value_dim",
-    )
+    return softmax(scores, dim=-1) @ v

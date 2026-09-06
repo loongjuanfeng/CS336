@@ -18,15 +18,15 @@ class TransformerBlock(nn.Module):
         d_model: int,
         num_heads: int,
         d_ff: int,
-        max_seq_len: int,
-        theta: float,
+        context_length: int,
+        rope_theta: float,
         *,
         device: torch.device | str | None = None,
         dtype: torch.dtype | None = None,
     ) -> None:
         super().__init__()
         rope = RotaryPositionalEmbedding(
-            theta, d_model // num_heads, max_seq_len, device=device
+            rope_theta, d_model // num_heads, context_length, device=device
         )
         self.ln1 = RMSNorm(d_model, device=device, dtype=dtype)
         self.attn = MultiHeadSelfAttention(

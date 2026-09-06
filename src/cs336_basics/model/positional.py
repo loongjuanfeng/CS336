@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import torch
-from einops import rearrange
 from torch import Tensor, nn
 
 
@@ -18,21 +17,21 @@ class RotaryPositionalEmbedding(nn.Module):
 
     def __init__(
         self,
-        theta: float,
-        d_k: int,
-        max_seq_len: int,
+        rope_theta: float,
+        head_dim: int,
+        context_length: int,
         device: torch.device | str | None = None,
     ) -> None:
         super().__init__()
-        half_dimension = d_k // 2
-        positions = torch.arange(max_seq_len, device=device, dtype=torch.float32)
+        half_dimension = head_dim // 2
+        positions = torch.arange(context_length, device=device, dtype=torch.float32)
         frequencies = torch.arange(half_dimension, device=device, dtype=torch.float32)
-        inverse_frequencies = theta ** (-2.0 * frequencies / d_k)
+        inverse_frequencies = rope_theta ** (-2.0 * frequencies / head_dim)
         angles = positions[:, None] * inverse_frequencies[None, :]
         self.register_buffer("cos", angles.cos(), persistent=False)
         self.register_buffer("sin", angles.sin(), persistent=False)
-        self.max_seq_len = max_seq_len
-        self.d_k = d_k
+        self.context_length = context_length
+        self.head_dim = head_dim
 
     def _align_positions(
         self, token_positions: Tensor, leading_shape: tuple[int, ...]
@@ -58,20 +57,6 @@ class RotaryPositionalEmbedding(nn.Module):
             )
             return token_positions.reshape(shape)
 
-        suffix_fits = len(position_leading) <= len(leading_shape) and all(
-            position_size in (1, input_size)
-            for position_size, input_size in zip(
-                position_leading, leading_shape[-len(position_leading) :], strict=False
-            )
-        )
-        if suffix_fits:
-            shape = (
-                (1,) * (len(leading_shape) - len(position_leading))
-                + position_leading
-                + token_positions.shape[-1:]
-            )
-            return token_positions.reshape(shape)
-
         shape = (1,) * (
             len(leading_shape) - len(position_leading)
         ) + token_positions.shape
@@ -87,15 +72,10 @@ class RotaryPositionalEmbedding(nn.Module):
         cos = cosine_cache[aligned_positions].to(dtype=x.dtype, device=x.device)
         sin = sine_cache[aligned_positions].to(dtype=x.dtype, device=x.device)
 
-        pairs = rearrange(
-            x,
-            "... (pairs components) -> ... pairs components",
-            pairs=self.d_k // 2,
-            components=2,
-        )
+        pairs = x.unflatten(-1, (self.head_dim // 2, 2))
         even = pairs[..., 0]
         odd = pairs[..., 1]
         rotated_even = even * cos - odd * sin
         rotated_odd = even * sin + odd * cos
         rotated = torch.stack((rotated_even, rotated_odd), dim=-1)
-        return rearrange(rotated, "... pairs components -> ... (pairs components)")
+        return rotated.flatten(-2)

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import torch
-from einops import rearrange
 from torch import Tensor, nn
 
 from .positional import RotaryPositionalEmbedding
@@ -35,23 +34,11 @@ class MultiHeadSelfAttention(nn.Module):
     def forward(self, x: Tensor, token_positions: Tensor | None = None) -> Tensor:
         """Return causal attention outputs for ``(..., sequence, d_model)``."""
         sequence_length = x.shape[-2]
-        q = rearrange(
-            self.q_proj(x),
-            "... sequence (heads head_dim) -> ... heads sequence head_dim",
-            heads=self.num_heads,
-            head_dim=self.head_dim,
-        )
-        k = rearrange(
-            self.k_proj(x),
-            "... sequence (heads head_dim) -> ... heads sequence head_dim",
-            heads=self.num_heads,
-            head_dim=self.head_dim,
-        )
-        v = rearrange(
-            self.v_proj(x),
-            "... sequence (heads head_dim) -> ... heads sequence head_dim",
-            heads=self.num_heads,
-            head_dim=self.head_dim,
+        q, k, v = (
+            projection(x)
+            .unflatten(-1, (self.num_heads, self.head_dim))
+            .transpose(-3, -2)
+            for projection in (self.q_proj, self.k_proj, self.v_proj)
         )
 
         if self.rope is not None:
@@ -67,8 +54,5 @@ class MultiHeadSelfAttention(nn.Module):
             dtype=torch.bool,
         ).tril()
         attended = scaled_dot_product_attention(q, k, v, causal_mask)
-        attended = rearrange(
-            attended,
-            "... heads sequence head_dim -> ... sequence (heads head_dim)",
-        )
+        attended = attended.transpose(-3, -2).flatten(-2)
         return self.output_proj(attended)
