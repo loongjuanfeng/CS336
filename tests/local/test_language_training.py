@@ -5,9 +5,9 @@ import pytest
 import torch
 from torch import Tensor, nn
 
-from model import TransformerLanguageModel
-from optimization import AdamW
-from training import (
+from cs336_basics.model.transformer import TransformerLanguageModel
+from cs336_basics.optimization import AdamW
+from cs336_basics.training import (
     cross_entropy,
     evaluate,
     get_batch,
@@ -46,7 +46,9 @@ def test_cross_entropy_is_shift_stable_and_preserves_dtype():
 
     assert torch.isfinite(output)
     assert half_output.dtype == torch.float16
-    torch.testing.assert_close(output, torch.nn.functional.cross_entropy(logits, targets))
+    torch.testing.assert_close(
+        output, torch.nn.functional.cross_entropy(logits, targets)
+    )
     torch.testing.assert_close(output, cross_entropy(shifted_logits, targets))
     torch.testing.assert_close(
         half_output,

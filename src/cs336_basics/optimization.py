@@ -14,7 +14,7 @@ from torch.optim import Optimizer
 class AdamW(Optimizer):
     """Adam with decoupled weight decay.
 
-    The update follows PyTorch's AdamW ordering and bias corrections, while
+    The update follows the assignment handout's epsilon placement, while
     keeping the implementation small enough to make the assignment's update
     rule explicit.
     """
@@ -43,7 +43,8 @@ class AdamW(Optimizer):
 
     def step(self, closure: Callable[[], float] | None = None) -> float | None:
         """Perform one update and return a closure's recomputed loss, if any."""
-        loss = closure() if closure is not None else None
+        with torch.enable_grad():
+            loss = closure() if closure is not None else None
 
         with torch.no_grad():
             for group in self.param_groups:
@@ -82,12 +83,10 @@ class AdamW(Optimizer):
                     parameter.mul_(1.0 - learning_rate * weight_decay)
                     bias_correction1 = 1.0 - beta1**step_number
                     bias_correction2 = 1.0 - beta2**step_number
-                    step_size = learning_rate / bias_correction1
-                    denominator = (
-                        exp_avg_sq.sqrt()
-                        .div_(math.sqrt(bias_correction2))
-                        .add_(epsilon)
+                    step_size = (
+                        learning_rate * math.sqrt(bias_correction2) / bias_correction1
                     )
+                    denominator = exp_avg_sq.sqrt().add_(epsilon)
                     parameter.addcdiv_(exp_avg, denominator, value=-step_size)
 
         return loss
@@ -95,8 +94,8 @@ class AdamW(Optimizer):
 
 def cosine_learning_rate(
     step: int,
-    maximum_learning_rate: float,
-    minimum_learning_rate: float,
+    max_learning_rate: float,
+    min_learning_rate: float,
     warmup_steps: int,
     decay_steps: int,
 ) -> float:
@@ -106,18 +105,17 @@ def cosine_learning_rate(
     zero.  At and beyond ``decay_steps`` the schedule stays at the minimum.
     """
     if step < warmup_steps:
-        return maximum_learning_rate * step / warmup_steps
+        return max_learning_rate * step / warmup_steps
     if step >= decay_steps:
-        return minimum_learning_rate
+        return min_learning_rate
     progress = (step - warmup_steps) / (decay_steps - warmup_steps)
-    return minimum_learning_rate + 0.5 * (
-        maximum_learning_rate - minimum_learning_rate
-    ) * (1.0 + math.cos(math.pi * progress))
+    return min_learning_rate + 0.5 * (max_learning_rate - min_learning_rate) * (
+        1.0 + math.cos(math.pi * progress)
+    )
 
 
-def clip_gradient(parameters: Iterable[Tensor], maximum_norm: float) -> None:
+def clip_gradient(parameters: Iterable[Tensor], max_norm: float) -> None:
     """Clip all present gradients in place to a combined L2 norm."""
-    parameters = list(parameters)
     gradients = [
         parameter.grad for parameter in parameters if parameter.grad is not None
     ]
@@ -127,11 +125,10 @@ def clip_gradient(parameters: Iterable[Tensor], maximum_norm: float) -> None:
     total_norm = torch.linalg.vector_norm(
         torch.stack([gradient.norm(2) for gradient in gradients])
     )
-    clip_coefficient = maximum_norm / (total_norm + 1e-6)
+    clip_coefficient = max_norm / (total_norm + 1e-6)
     clip_coefficient = clip_coefficient.clamp(max=1.0)
     for gradient in gradients:
         gradient.mul_(clip_coefficient)
-    return
 
 
 __all__ = [

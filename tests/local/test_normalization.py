@@ -1,6 +1,6 @@
 import torch
 
-from model import RMSNorm
+from cs336_basics.model.primitives import RMSNorm
 
 
 def test_rms_norm_preserves_shape():

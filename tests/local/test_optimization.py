@@ -5,10 +5,10 @@ import torch
 from torch import nn
 from torch.nn.utils import clip_grad_norm_
 
-from optimization import AdamW, clip_gradient, cosine_learning_rate
+from cs336_basics.optimization import AdamW, clip_gradient, cosine_learning_rate
 
 
-def test_adamw_matches_pytorch():
+def test_adamw_agrees_with_pytorch_at_small_epsilon():
     torch.manual_seed(0)
     initial = torch.randn(4, 5)
     actual_parameter = nn.Parameter(initial.clone())
@@ -76,7 +76,7 @@ def test_gradient_clipping_matches_pytorch_and_returns_none():
             expected.grad = gradient.clone()
 
     clip_grad_norm_(expected_parameters, max_norm=0.2)
-    result = clip_gradient(actual_parameters, maximum_norm=0.2)
+    result = clip_gradient(actual_parameters, max_norm=0.2)
 
     assert result is None
     for actual, expected in zip(actual_parameters, expected_parameters, strict=True):
@@ -87,8 +87,8 @@ def test_gradient_clipping_matches_pytorch_and_returns_none():
 def test_cosine_schedule_has_exact_boundaries():
     schedule = lambda step: cosine_learning_rate(
         step,
-        maximum_learning_rate=1.0,
-        minimum_learning_rate=0.1,
+        max_learning_rate=1.0,
+        min_learning_rate=0.1,
         warmup_steps=4,
         decay_steps=12,
     )
@@ -100,3 +100,15 @@ def test_cosine_schedule_has_exact_boundaries():
     assert schedule(20) == 0.1
     assert schedule(8) == pytest.approx(0.55)
     assert schedule(6) == pytest.approx(0.1 + 0.45 * (1.0 + math.cos(math.pi / 4)))
+
+
+def test_adamw_uses_handout_epsilon_placement():
+    # A large epsilon distinguishes sqrt(v) + eps from sqrt(v_hat) + eps.
+    parameter = nn.Parameter(torch.tensor([2.0], dtype=torch.float64))
+    parameter.grad = torch.tensor([0.5], dtype=torch.float64)
+    optimizer = AdamW([parameter], lr=0.1, betas=(0.8, 0.9), eps=0.2, weight_decay=0.3)
+    optimizer.step()
+    expected = 2.0 * (1 - 0.1 * 0.3) - (0.1 * math.sqrt(0.1) / 0.2) * 0.1 / (
+        math.sqrt(0.025) + 0.2
+    )
+    assert parameter.item() == pytest.approx(expected)

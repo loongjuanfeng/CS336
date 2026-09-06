@@ -12,7 +12,7 @@ import torch
 from torch import Tensor, nn
 from torch.optim import Optimizer
 
-from optimization import clip_gradient
+from .optimization import clip_gradient
 
 
 def cross_entropy(logits: Tensor, targets: Tensor) -> Tensor:
@@ -36,6 +36,10 @@ def get_batch(
     device: torch.device | str,
 ) -> tuple[Tensor, Tensor]:
     """Sample random contiguous input/target windows from a token array."""
+    if dataset.ndim != 1 or len(dataset) <= context_length:
+        raise ValueError("dataset must be 1D and longer than context_length")
+    if batch_size < 1 or context_length < 1:
+        raise ValueError("batch_size and context_length must be positive")
     starts = np.random.randint(0, len(dataset) - context_length, size=batch_size)
     inputs = np.stack([dataset[start : start + context_length] for start in starts])
     targets = np.stack(
@@ -112,7 +116,7 @@ def train(
     *,
     start_iteration: int = 0,
     learning_rate_schedule: Callable[[int], float] | None = None,
-    maximum_gradient_norm: float | None = None,
+    max_gradient_norm: float | None = None,
     validation_data: np.ndarray | None = None,
     validation_batches: int = 10,
     report_every: int = 100,
@@ -143,8 +147,8 @@ def train(
         logits = model(input_ids)
         last_loss = cross_entropy(logits, targets)
         last_loss.backward()
-        if maximum_gradient_norm is not None:
-            clip_gradient(model.parameters(), maximum_gradient_norm)
+        if max_gradient_norm is not None:
+            clip_gradient(model.parameters(), max_gradient_norm)
         optimizer.step()
 
         completed_iteration = iteration + 1

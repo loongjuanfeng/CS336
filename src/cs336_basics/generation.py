@@ -5,7 +5,7 @@ from __future__ import annotations
 import torch
 from torch import Tensor, nn
 
-from model import softmax
+from .model.primitives import softmax
 
 
 def _top_p_filter(probabilities: Tensor, top_p: float) -> Tensor:
@@ -24,13 +24,13 @@ def _top_p_filter(probabilities: Tensor, top_p: float) -> Tensor:
 def generate(
     model: nn.Module,
     input_ids: Tensor,
-    maximum_new_tokens: int,
+    max_new_tokens: int,
     *,
     temperature: float = 1.0,
     top_p: float = 1.0,
     eos_token_id: int | None = None,
 ) -> Tensor:
-    """Sample up to ``maximum_new_tokens`` continuations for a token batch."""
+    """Sample up to ``max_new_tokens`` continuations for a token batch."""
     was_training = model.training
     model.eval()
     try:
@@ -44,7 +44,7 @@ def generate(
             )
         )
 
-        for _ in range(maximum_new_tokens):
+        for _ in range(max_new_tokens):
             if eos_token_id is not None and bool(finished.all()):
                 break
 
@@ -57,8 +57,7 @@ def generate(
             next_tokens = torch.multinomial(probabilities, num_samples=1).squeeze(-1)
 
             if eos_token_id is not None:
-                eos_tokens = torch.full_like(next_tokens, eos_token_id)
-                next_tokens = torch.where(finished, eos_tokens, next_tokens)
+                next_tokens = torch.where(finished, eos_token_id, next_tokens)
                 finished = finished | (next_tokens == eos_token_id)
 
             generated = torch.cat((generated, next_tokens.unsqueeze(-1)), dim=-1)

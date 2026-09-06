@@ -4,19 +4,18 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 
-from model import (
+from cs336_basics.model.attention import MultiHeadSelfAttention
+from cs336_basics.model.positional import RotaryPositionalEmbedding
+from cs336_basics.model.primitives import (
     Embedding,
     Linear,
-    MultiHeadSelfAttention,
     RMSNorm,
-    RotaryPositionalEmbedding,
     SwiGLU,
-    TransformerBlock,
-    TransformerLanguageModel,
     scaled_dot_product_attention,
     silu,
     softmax,
 )
+from cs336_basics.model.transformer import TransformerBlock, TransformerLanguageModel
 
 
 def _rotate_reference(x: Tensor, angles: Tensor) -> Tensor:
@@ -127,7 +126,7 @@ def test_rope_uses_cached_buffers_and_supports_arbitrary_batch_dimensions():
     torch.manual_seed(3)
     theta = 10_000.0
     d_k = 8
-    rope = RotaryPositionalEmbedding(theta, d_k, max_seq_len=16)
+    rope = RotaryPositionalEmbedding(theta, d_k, context_length=16)
     inputs = torch.randn(2, 3, 4, 5, d_k)
     positions = torch.randint(0, 16, (2, 3, 4, 5))
     expected = _rotate_reference(inputs, _rope_angles(positions, d_k, theta))
@@ -147,7 +146,7 @@ def test_attention_rope_broadcasts_when_batch_size_differs_from_head_count():
     d_model = 8
     head_dimension = d_model // num_heads
     theta = 10_000.0
-    rope = RotaryPositionalEmbedding(theta, head_dimension, max_seq_len=12)
+    rope = RotaryPositionalEmbedding(theta, head_dimension, context_length=12)
     attention = MultiHeadSelfAttention(d_model, num_heads, rope)
     inputs = torch.randn(batch_size, sequence_length, d_model)
     positions = torch.tensor(
@@ -188,7 +187,7 @@ def test_attention_rope_broadcasts_when_batch_size_differs_from_head_count():
 
 def test_attention_is_causal_under_prefix_extension():
     torch.manual_seed(5)
-    rope = RotaryPositionalEmbedding(10_000.0, d_k=4, max_seq_len=8)
+    rope = RotaryPositionalEmbedding(10_000.0, head_dim=4, context_length=8)
     attention = MultiHeadSelfAttention(d_model=12, num_heads=3, rope=rope)
     inputs = torch.randn(2, 7, 12)
 
@@ -200,7 +199,7 @@ def test_attention_is_causal_under_prefix_extension():
 
 def test_transformer_block_matches_its_pre_norm_residual_definition():
     torch.manual_seed(6)
-    block = TransformerBlock(8, 2, 16, max_seq_len=6, theta=10_000.0)
+    block = TransformerBlock(8, 2, 16, context_length=6, rope_theta=10_000.0)
     inputs = torch.randn(2, 6, 8)
     after_attention = inputs + block.attn(block.ln1(inputs))
     expected = after_attention + block.ffn(block.ln2(after_attention))

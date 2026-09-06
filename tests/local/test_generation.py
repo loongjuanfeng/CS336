@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor, nn
 
-from generation import generate
+from cs336_basics.generation import generate
 
 
 class _SequenceModel(nn.Module):
@@ -46,7 +46,7 @@ def test_generate_truncates_each_model_context_and_restores_mode():
     model.train()
     input_ids = torch.tensor([[0, 1, 2, 3]])
 
-    output = generate(model, input_ids, maximum_new_tokens=2)
+    output = generate(model, input_ids, max_new_tokens=2)
 
     torch.testing.assert_close(output, torch.tensor([[0, 1, 2, 3, 4, 5]]))
     torch.testing.assert_close(model.inputs[0], torch.tensor([[1, 2, 3]]))
@@ -58,7 +58,7 @@ def test_generate_top_p_keeps_the_smallest_probability_nucleus():
     model = _ProbabilityModel()
     input_ids = torch.zeros((8, 1), dtype=torch.long)
 
-    output = generate(model, input_ids, maximum_new_tokens=1, top_p=0.55)
+    output = generate(model, input_ids, max_new_tokens=1, top_p=0.55)
 
     torch.testing.assert_close(output[:, -1], torch.zeros(8, dtype=torch.long))
 
@@ -74,7 +74,7 @@ def test_generate_stops_when_every_batch_row_reaches_eos():
     output = generate(
         model,
         input_ids,
-        maximum_new_tokens=5,
+        max_new_tokens=5,
         eos_token_id=eos_token_id,
     )
 
