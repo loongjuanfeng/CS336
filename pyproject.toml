@@ -1,7 +1,7 @@
 [project]
 name = "basics"
 version = "0.0.0"
-description = "CS336 assignment 1: Basics"
+description = "CS336 2026: completed A1 baseline and A2 systems starter"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-main = "basics:main"
+cs336-train = "cs336_basics.cli:main"
 
 [build-system]
 requires = ["setuptools>=77"]
@@ -20,15 +20,42 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-py-modules = ["generation", "optimization", "training"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["basics*", "model*", "tokenizer*"]
+include = ["cs336_basics*", "cs336_systems*"]
 
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
     "modal>=1.5.5",
     "pytest>=9.1.1",
+    "triton==3.8.0",
+    "jaxtyping>=0.3",
+    "psutil>=7",
+    "pytest-timeout>=2",
+    "tiktoken>=0.12",
+    "humanfriendly>=10",
+    "matplotlib>=3.10",
+    "pandas>=2",
+    "tqdm>=4.67",
+    "wandb>=0.25",
+    "ruff>=0.15.10",
+    "ty>=0.0.29",
 ]
+
+[tool.uv.sources]
+torch = { path = "wheels/torch-2.14.0a0+git2b3ec34-cp314-cp314-linux_x86_64.whl" }
+triton = { url = "https://download-r2.pytorch.org/whl/nightly/triton-3.8.0%2Bgit675c5987-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl" }
+
+[tool.ty.environment]
+python = "./.venv"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/local", "tests/assignment1"]
+
+[tool.ruff]
+extend-exclude = ["tests/assignment1", "tests/assignment2"]
+
+[tool.ty.src]
+exclude = ["tests/assignment1", "tests/assignment2"]

@@ -3,15 +3,19 @@ __pycache__/
 *.py[oc]
 build/
 dist/
-wheels/
+/wheels/
 *.egg-info
 .pytest_cache
 
 # Virtual environments
 .venv
+.venvs/
+
+# direnv
+.direnv/
+.env
 
 # uv
-uv.lock
 .python-version
 
 # ruff
@@ -19,3 +23,10 @@ uv.lock
 
 # data
 data/
+
+# Training and profiling outputs
+/checkpoints/
+/results/
+*.nsys-rep
+*.nsys-aranges
+*.sqlite
