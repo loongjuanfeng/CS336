@@ -1,0 +1,10 @@
+{
+  "assignment1-basics": {
+    "commit": "a158843b20107949f1a8d7df1b05cd33b9166712",
+    "handout_sha256": "cf402d1c6d3c66da035bdf33b3e2c1bbc4bb92a78b006ee36577e925a265e328"
+  },
+  "assignment2-systems": {
+    "commit": "ca8bc81a59b70516f7ebb2da4808daade877c736",
+    "handout_sha256": "f5667e3b6fac23c3a6d4ad4a999445b96aab3fb2246904d13ec86b79320b1a84"
+  }
+}
