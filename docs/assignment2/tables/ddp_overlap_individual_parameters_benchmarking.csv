@@ -1,0 +1,1 @@
+status,implementation,model,global_batch,context,dtype,world_size,mean_ms,stdev_ms,speedup_vs_naive,trace_path,source_run,commit,software_versions,notes

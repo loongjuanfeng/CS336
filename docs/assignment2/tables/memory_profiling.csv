@@ -1,0 +1,1 @@
+status,model,context,batch,mode,precision,peak_allocated_mib,peak_reserved_mib,residual_tensor_mib,counter_reset_definition,source_run,commit,software_versions,notes

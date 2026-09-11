@@ -1,0 +1,1 @@
+status,experiment,model,mode,precision,parameter_dtype,fc1_dtype,norm_dtype,logits_dtype,loss_dtype,gradient_dtype,mean_ms,stdev_ms,speedup,source_run,commit,software_versions,notes

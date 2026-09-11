@@ -31,6 +31,7 @@ def main() -> None:
     p.add_argument("--d-ff", type=int, default=1_024)
     args = p.parse_args()
 
+    # init
     device = torch.device(args.device)
     model = TransformerLanguageModel(
         vocab_size=args.vocab_size,
@@ -42,28 +43,55 @@ def main() -> None:
         rope_theta=10_000.0,
         device=device,
     )
+    model: TransformerLanguageModel = torch.compile(model)  # ty: ignore[invalid-assignment]
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
     tokens = torch.randint(
         0, args.vocab_size, (args.batch_size, args.context_length), device=device
     )
+    # init
 
+    # step definition starts
     def step() -> None:
         if args.mode == "train":
+            torch.cuda.nvtx.range_push("warmup")
             optimizer.zero_grad(set_to_none=True)
+            torch.cuda.nvtx.range_pop()
+
+        torch.cuda.nvtx.range_push("forward")
         logits = model(tokens)
+        torch.cuda.nvtx.range_pop()
+
         if args.mode != "forward":
+            torch.cuda.nvtx.range_push("backward")
             logits.float().mean().backward()
+            torch.cuda.nvtx.range_pop()
+
         if args.mode == "train":
+            torch.cuda.nvtx.range_push("optimize")
             optimizer.step()
+            torch.cuda.nvtx.range_pop()
+
+        torch.cuda.nvtx.range_push("sync")
         sync(device)
+        torch.cuda.nvtx.range_pop()
+
+    # step definition ends
 
     model.train()
-    for _ in range(args.warmup):
+
+    for T in range(args.warmup):
+        torch.cuda.nvtx.range_push(f"warmup {T}")
         step()
+        torch.cuda.nvtx.range_pop()
+
     timings = []
-    for _ in range(args.steps):
+    for T in range(args.steps):
         start = time.perf_counter()
+
+        torch.cuda.nvtx.range_push(f"range {T}")
         step()
+        torch.cuda.nvtx.range_pop()
+
         timings.append(time.perf_counter() - start)
     mean = statistics.mean(timings)
     stdev = statistics.stdev(timings) if len(timings) > 1 else 0.0

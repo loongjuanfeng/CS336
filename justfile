@@ -33,7 +33,6 @@ environment mode:
     ln -sfnT ".venvs/{{mode}}" .venv
     printf 'CS336_ENVIRONMENT=%s\n' "{{mode}}" > .env
 
-# Completed A1 baseline (also the default pytest selection).
 test:
     uv run pytest -q
 
@@ -43,12 +42,31 @@ test-local:
 test-a1:
     uv run pytest tests/assignment1 -q
 
-# A2 remains unimplemented; use collection to verify the starter wiring.
-collect-a2:
-    uv run pytest tests/assignment2 --collect-only -q
-
 test-a2:
     uv run pytest tests/assignment2 -q
 
 smoke:
     uv run cs336-train --smoke --steps 10 --output-dir checkpoints/smoke
+
+# CUDA kernels + the script's NVTX regions. Extra arguments go to the script.
+[positional-arguments]
+@trace script *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    mkdir -p results/traces
+    run_id=1
+    while [[ -e "results/traces/trace-$run_id.nsys-rep" || -e "results/traces/trace-$run_id.json.gz" ]]; do
+        run_id=$((run_id + 1))
+    done
+    output="results/traces/trace-$run_id"
+    export TORCHINDUCTOR_COMPILE_THREADS="${TORCHINDUCTOR_COMPILE_THREADS:-1}"
+    uv run nsys profile \
+        --output="$output" \
+        --trace=cuda,nvtx \
+        --sample=none \
+        --cpuctxsw=none \
+        --stats=false \
+        python "$@"
+    # Chrome trace JSON is readable by Perfetto; keep the original Nsight report.
+    uvx ncompass convert "$output.nsys-rep" --quiet
+    printf 'Nsight: %s.nsys-rep\nPerfetto: %s.json.gz\n' "$output" "$output"

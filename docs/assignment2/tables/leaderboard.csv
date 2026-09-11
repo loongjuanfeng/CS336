@@ -1,0 +1,1 @@
+status,gpu,world_size,dtype,batch,context,d_model,d_ff,layers,heads,vocab,rep_ms,warmup_ms,step_ms,cold_run_seconds,correctness_log,cache_directory,source_run,commit,software_versions,notes

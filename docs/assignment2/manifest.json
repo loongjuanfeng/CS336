@@ -1,0 +1,575 @@
+{
+  "handout_version": "26.1.3",
+  "course": "Spring 2026",
+  "commit": "ca8bc81a59b70516f7ebb2da4808daade877c736",
+  "handout_sha256": "f5667e3b6fac23c3a6d4ad4a999445b96aab3fb2246904d13ec86b79320b1a84",
+  "created": "2026-09-07",
+  "problems": [
+    {
+      "id": "benchmarking_script",
+      "title": "Benchmarking Script",
+      "points": 4,
+      "handout_page": 3,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/benchmarking_script.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/benchmarking_script.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "benchmarking",
+      "test_command": null
+    },
+    {
+      "id": "nsys_profile",
+      "title": "Nsight Systems Profiling",
+      "points": 5,
+      "handout_page": 6,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "guide": "problems/nsys_profile.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/nsys_profile.csv"
+      ],
+      "figure_stubs": [
+        "figures/nsys_profile_timeline.png.todo.md"
+      ],
+      "baseline_suite": "nsys",
+      "test_command": null
+    },
+    {
+      "id": "mixed_precision_accumulation",
+      "title": "Mixed-Precision Accumulation",
+      "points": 1,
+      "handout_page": 7,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/mixed_precision_accumulation.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/mixed_precision_accumulation.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "accumulation",
+      "test_command": null
+    },
+    {
+      "id": "benchmarking_mixed_precision",
+      "title": "Benchmarking Mixed Precision",
+      "points": 2,
+      "handout_page": 8,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/benchmarking_mixed_precision.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/benchmarking_mixed_precision.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "mixed-precision",
+      "test_command": null
+    },
+    {
+      "id": "memory_profiling",
+      "title": "Memory Profiling",
+      "points": 4,
+      "handout_page": 9,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f"
+      ],
+      "guide": "problems/memory_profiling.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/memory_profiling.csv",
+        "tables/memory_profiling_residuals.csv"
+      ],
+      "figure_stubs": [
+        "figures/memory_xl_forward.png.todo.md",
+        "figures/memory_xl_train.png.todo.md",
+        "figures/memory_largest_allocations.png.todo.md",
+        "figures/memory_block_residuals.png.todo.md",
+        "figures/memory_block_backward.png.todo.md"
+      ],
+      "baseline_suite": "memory",
+      "test_command": null
+    },
+    {
+      "id": "gradient_checkpointing",
+      "title": "Memory-Optimal Gradient Checkpointing",
+      "points": 4,
+      "handout_page": 15,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b"
+      ],
+      "guide": "problems/gradient_checkpointing.md",
+      "code": [
+        "src/cs336_systems/checkpointing.py",
+        "src/cs336_systems/baseline/transformer.py"
+      ],
+      "tables": [
+        "tables/gradient_checkpointing.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "checkpointing",
+      "test_command": null
+    },
+    {
+      "id": "pytorch_attention",
+      "title": "PyTorch Attention Benchmarking",
+      "points": 2,
+      "handout_page": 16,
+      "status": "todo",
+      "parts": [
+        "a"
+      ],
+      "guide": "problems/pytorch_attention.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/pytorch_attention.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "attention",
+      "test_command": null
+    },
+    {
+      "id": "torch_compile",
+      "title": "Torch Compile",
+      "points": 2,
+      "handout_page": 16,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b"
+      ],
+      "guide": "problems/torch_compile.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/torch_compile.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "compile",
+      "test_command": null
+    },
+    {
+      "id": "flash_forward",
+      "title": "FlashAttention-2 Forward Pass",
+      "points": 15,
+      "handout_page": 26,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/flash_forward.md",
+      "code": [
+        "src/cs336_systems/flash_attention.py"
+      ],
+      "tables": [
+        "tables/flash_forward.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_attention.py -k flash_forward -q"
+    },
+    {
+      "id": "flash_backward",
+      "title": "FlashAttention-2 Backward Pass",
+      "points": 5,
+      "handout_page": 28,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/flash_backward.md",
+      "code": [
+        "src/cs336_systems/flash_attention.py"
+      ],
+      "tables": [
+        "tables/flash_backward.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_attention.py -k flash_backward -q"
+    },
+    {
+      "id": "flash_benchmarking",
+      "title": "FlashAttention-2 Benchmarking",
+      "points": 5,
+      "handout_page": 28,
+      "status": "todo",
+      "parts": [
+        "a"
+      ],
+      "guide": "problems/flash_benchmarking.md",
+      "code": [
+        "src/cs336_systems/experiments.py",
+        "src/cs336_systems/flash_attention.py"
+      ],
+      "tables": [
+        "tables/flash_benchmarking.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "flash",
+      "test_command": null
+    },
+    {
+      "id": "distributed_communication_single_node",
+      "title": "Distributed Communication (Single Node)",
+      "points": 5,
+      "handout_page": 32,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/distributed_communication_single_node.md",
+      "code": [
+        "src/cs336_systems/baseline/cli.py"
+      ],
+      "tables": [
+        "tables/distributed_communication_single_node.csv"
+      ],
+      "figure_stubs": [
+        "figures/communication_scaling.png.todo.md"
+      ],
+      "baseline_suite": "communication",
+      "test_command": null
+    },
+    {
+      "id": "naive_ddp",
+      "title": "Naïve DDP",
+      "points": 5,
+      "handout_page": 33,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/naive_ddp.md",
+      "code": [
+        "src/cs336_systems/ddp.py"
+      ],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_ddp.py -q"
+    },
+    {
+      "id": "naive_ddp_benchmarking",
+      "title": "Naïve DDP Benchmarking",
+      "points": 3,
+      "handout_page": 33,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/naive_ddp_benchmarking.md",
+      "code": [
+        "src/cs336_systems/experiments.py",
+        "src/cs336_systems/ddp.py"
+      ],
+      "tables": [
+        "tables/naive_ddp_benchmarking.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "ddp",
+      "test_command": null
+    },
+    {
+      "id": "minimal_ddp_flat_benchmarking",
+      "title": "Minimal DDP with Flat Gradients Benchmarking",
+      "points": 2,
+      "handout_page": 34,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/minimal_ddp_flat_benchmarking.md",
+      "code": [
+        "src/cs336_systems/ddp.py",
+        "src/cs336_systems/experiments.py"
+      ],
+      "tables": [
+        "tables/minimal_ddp_flat_benchmarking.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "ddp",
+      "test_command": null
+    },
+    {
+      "id": "ddp_overlap_individual_parameters",
+      "title": "DDP with Overlapping Individual Parameters",
+      "points": 5,
+      "handout_page": 35,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/ddp_overlap_individual_parameters.md",
+      "code": [
+        "src/cs336_systems/ddp.py"
+      ],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_ddp.py -q"
+    },
+    {
+      "id": "ddp_overlap_individual_parameters_benchmarking",
+      "title": "DDP Overlapping Individual Parameters Benchmarking",
+      "points": 1,
+      "handout_page": 36,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b"
+      ],
+      "guide": "problems/ddp_overlap_individual_parameters_benchmarking.md",
+      "code": [
+        "src/cs336_systems/experiments.py",
+        "src/cs336_systems/ddp.py"
+      ],
+      "tables": [
+        "tables/ddp_overlap_individual_parameters_benchmarking.csv"
+      ],
+      "figure_stubs": [
+        "figures/ddp_naive.png.todo.md",
+        "figures/ddp_overlap.png.todo.md"
+      ],
+      "baseline_suite": "ddp",
+      "test_command": null
+    },
+    {
+      "id": "optimizer_state_sharding",
+      "title": "Optimizer State Sharding",
+      "points": 15,
+      "handout_page": 37,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/optimizer_state_sharding.md",
+      "code": [
+        "src/cs336_systems/sharded_optimizer.py"
+      ],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_sharded_optimizer.py -q"
+    },
+    {
+      "id": "optimizer_state_sharding_accounting",
+      "title": "Optimizer State Sharding Accounting",
+      "points": 5,
+      "handout_page": 38,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/optimizer_state_sharding_accounting.md",
+      "code": [
+        "src/cs336_systems/experiments.py",
+        "src/cs336_systems/sharded_optimizer.py"
+      ],
+      "tables": [
+        "tables/optimizer_state_sharding_accounting.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "sharding",
+      "test_command": null
+    },
+    {
+      "id": "fsdp",
+      "title": "Fully-Sharded Data Parallel",
+      "points": 15,
+      "handout_page": 38,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/fsdp.md",
+      "code": [
+        "src/cs336_systems/fsdp.py"
+      ],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": "uv run pytest tests/assignment2/test_fsdp.py -q"
+    },
+    {
+      "id": "fsdp_accounting",
+      "title": "FSDP Accounting",
+      "points": 5,
+      "handout_page": 39,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b"
+      ],
+      "guide": "problems/fsdp_accounting.md",
+      "code": [
+        "src/cs336_systems/experiments.py",
+        "src/cs336_systems/fsdp.py"
+      ],
+      "tables": [
+        "tables/fsdp_accounting.csv"
+      ],
+      "figure_stubs": [
+        "figures/fsdp_all_gather.png.todo.md"
+      ],
+      "baseline_suite": "fsdp",
+      "test_command": null
+    },
+    {
+      "id": "alternate_ring_all_reduce",
+      "title": "Alternate ring all-reduce",
+      "points": 1,
+      "handout_page": 41,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/alternate_ring_all_reduce.md",
+      "code": [],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": null
+    },
+    {
+      "id": "data_parallel_calcs",
+      "title": "Data parallel calculations",
+      "points": 3,
+      "handout_page": 42,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/data_parallel_calcs.md",
+      "code": [],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": null
+    },
+    {
+      "id": "fsdp_calcs",
+      "title": "Fully sharded data parallel calculations",
+      "points": 3,
+      "handout_page": 43,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c"
+      ],
+      "guide": "problems/fsdp_calcs.md",
+      "code": [],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": null
+    },
+    {
+      "id": "tp_calcs",
+      "title": "Tensor parallel calculations",
+      "points": 4,
+      "handout_page": 44,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "guide": "problems/tp_calcs.md",
+      "code": [],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": null
+    },
+    {
+      "id": "fsdp_tp_calcs",
+      "title": "2D parallelism calculations",
+      "points": 6,
+      "handout_page": 46,
+      "status": "todo",
+      "parts": [
+        "a",
+        "b",
+        "c",
+        "d"
+      ],
+      "guide": "problems/fsdp_tp_calcs.md",
+      "code": [],
+      "tables": [],
+      "figure_stubs": [],
+      "baseline_suite": null,
+      "test_command": null
+    },
+    {
+      "id": "leaderboard",
+      "title": "Leaderboard: fastest training step",
+      "points": 10,
+      "handout_page": 48,
+      "status": "todo",
+      "parts": [
+        "answer"
+      ],
+      "guide": "problems/leaderboard.md",
+      "code": [
+        "src/cs336_systems/leaderboard.py"
+      ],
+      "tables": [
+        "tables/leaderboard.csv"
+      ],
+      "figure_stubs": [],
+      "baseline_suite": "leaderboard",
+      "test_command": null
+    }
+  ]
+}
